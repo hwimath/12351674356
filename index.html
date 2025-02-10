@@ -1,901 +1,845 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>연속함수의 성질</title>
-<!-- MathJax for LaTeX rendering -->
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
-<style>
-  /* 흑백 색상 테마 */
-  body {
-    background-color: #ffffff;
-    color: #000000;
-    font-family: sans-serif;
-    margin: 20px;
-  }
-  h1, h2, h3 {
-    color: #000000;
-  }
-
-  /* 심플한 에너지바 스타일(흑백) */
-  #energyBarContainer {
-    width: 300px;
-    height: 20px;
-    border: 2px solid #000;
-    background-color: #fff;
-    margin: 10px 0;
-  }
-  #energyBar {
-    height: 100%;
-    background-color: #000;
-    width: 100%;
-    transition: width 0.2s linear;
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  .question-container {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #000;
-    padding-bottom: 10px;
-  }
-
-  .choices-container {
-    margin-left: 20px;
-  }
-
-  .choice {
-    margin: 5px 0;
-  }
-
-  #lives {
-    font-weight: bold;
-  }
-
-  #difficultySelection, #quizArea, #finalArea {
-    margin: 10px 0;
-  }
-
-  #response {
-    white-space: pre-wrap;
-    font-size: 0.9em;
-    color: #000;
-    margin-top: 10px;
-  }
-
-</style>
+  <meta charset="UTF-8">
+  <title>연속함수의 성질</title>
+  <!-- MathJax for LaTeX rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+  <style>
+    /* 흑백 색상 테마 */
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    h1, h2, h3 {
+      color: #000000;
+    }
+    /* 심플한 에너지바 스타일(흑백) */
+    #energyBarContainer {
+      width: 300px;
+      height: 20px;
+      border: 2px solid #000;
+      background-color: #fff;
+      margin: 10px 0;
+    }
+    #energyBar {
+      height: 100%;
+      background-color: #000;
+      width: 100%;
+      transition: width 0.2s linear;
+    }
+    .hidden {
+      display: none;
+    }
+    .question-container {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #000;
+      padding-bottom: 10px;
+    }
+    .choices-container {
+      margin-left: 20px;
+    }
+    .choice {
+      margin: 5px 0;
+    }
+    #lives {
+      font-weight: bold;
+    }
+    #difficultySelection, #quizArea, #finalArea {
+      margin: 10px 0;
+    }
+    #response, #feedback {
+      white-space: pre-wrap;
+      font-size: 0.9em;
+      color: #000;
+      margin-top: 10px;
+    }
+    #nextButton {
+      margin-top: 10px;
+      padding: 5px 10px;
+      font-size: 1em;
+    }
+  </style>
 </head>
 <body>
 
-<h1>연속함수의 성질</h1>
+  <h1>연속함수의 성질</h1>
 
-<!-- 난이도 선택 & 이름 입력 -->
-<div id="startScreen">
-  <p>이름을 입력하세요:</p>
-  <input type="text" id="userName" placeholder="이름 입력">
-  <p>난이도를 선택하세요:</p>
-  <button onclick="startGame('최상')">최상 (20초)</button>
-  <button onclick="startGame('상')">상 (30초)</button>
-  <button onclick="startGame('중')">중 (40초)</button>
-  <button onclick="startGame('하')">하 (시간제한 없음)</button>
-</div>
-
-<!-- 퀴즈 영역 -->
-<div id="quizArea" class="hidden">
-  <p>남은 기회: <span id="lives">3</span></p>
-  <p>현재 점수: <span id="score">0</span></p>
-  <p>전체 경과 시간: <span id="totalTime">0</span>초</p>
-
-  <!-- 에너지바 (시간제한 시) -->
-  <div id="energyBarContainer">
-    <div id="energyBar"></div>
+  <!-- 난이도 선택 및 이름 입력 -->
+  <div id="startScreen">
+    <p>이름을 입력하세요:</p>
+    <input type="text" id="userName" placeholder="이름 입력">
+    <p>난이도를 선택하세요:</p>
+    <button onclick="startGame('최상')">최상 (20초)</button>
+    <button onclick="startGame('상')">상 (30초)</button>
+    <button onclick="startGame('중')">중 (40초)</button>
+    <button onclick="startGame('하')">하 (시간제한 없음)</button>
   </div>
 
-  <!-- 문제 표시 영역 -->
-  <div id="questionDisplay"></div>
-</div>
+  <!-- 퀴즈 영역 -->
+  <div id="quizArea" class="hidden">
+    <p>남은 기회: <span id="lives">3</span></p>
+    <p>현재 점수: <span id="score">0</span></p>
+    <p>전체 경과 시간: <span id="totalTime">0</span>초</p>
 
-<!-- 게임 종료 후 점수 전송 영역 -->
-<div id="finalArea" class="hidden">
-  <h2>게임 종료</h2>
-  <p>최종 점수: <span id="finalScore"></span></p>
-  <button onclick="sendScore()">점수전송</button>
-  <div id="response"></div>
-</div>
+    <!-- 에너지바 (시간제한 시) -->
+    <div id="energyBarContainer">
+      <div id="energyBar"></div>
+    </div>
 
-<script>
-/* 
-  모든 문제 데이터: "절대 생략하지 말라" 하셨으므로,
-  앞선 대화에서 나온 모든 문제(총 38문제)를 순서 상관없이 저장.
-  각 문제는 question, choices[], correct 로 구성.
-  보기(4지선다)도 그대로 옮기되, 정답 인덱스를 0~3으로 조정.
-  본문 라텍스식은 \\(...\\) 형태 안에서 \\dfrac{}{}를 사용할 때 이스케이프.
-  (문제 번호는 출력 시 생략하라는 지시. 여기선 내부적으로만 구분)
-*/
+    <!-- 문제 표시 영역 -->
+    <div id="questionDisplay"></div>
+    <!-- 피드백 영역 (정답/오답/시간초과 메시지) -->
+    <div id="feedback"></div>
+    <!-- 다음 문제 버튼: 정답 또는 오답 확인 후 활성 -->
+    <button id="nextButton" class="hidden" onclick="nextQuestion()">다음문제</button>
+  </div>
 
-// 길어서 질문+보기+정답을 전부 기록.
-const allQuestions = [
+  <!-- 게임 종료 후 점수 전송 영역 -->
+  <div id="finalArea" class="hidden">
+    <h2>게임 종료</h2>
+    <p>최종 점수: <span id="finalScore"></span></p>
+    <button onclick="sendScore()">점수전송</button>
+    <div id="response"></div>
+  </div>
 
-  // 예시) { question: "...", choices: ["...", "...", "...", "..."], correct: n }
+  <script>
+    /* 
+      모든 문제 데이터 – 
+      원래 38문제 중 계산 난이도가 지나치게 복잡하거나 매개변수 \(a\)가 등장하는 (어색한) 문제는 삭제함.
+      (각 문제는 question, choices[], correct 로 구성하며, 보기(4지선다)는 그대로 옮김)
+    */
+    const allQuestions = [
+      // 문제 1
+      {
+        question: 
+          "두 함수 \\(f(x), g(x)\\)가 실수 전체에서 연속일 때,\n" +
+          "다음 <보기> 중 실수 전체에서 **항상** 연속인 것들만 모아놓은 것은?\n\n" +
+          "<보기>\n" +
+          "1) \\(f(x)+g(x)\\)\n" +
+          "2) \\(f(x)-g(x)\\)\n" +
+          "3) \\(f(x)g(x)\\)\n" +
+          "4) \\(\\dfrac{f(x)}{g(x)}\\)\n",
+        choices: [
+          "①, ②",
+          "①, ②, ③",
+          "①, ③",
+          "①, ②, ③, ④"
+        ],
+        correct: 1
+      },
+      // 문제 2
+      {
+        question: 
+          "두 함수 \\(f(x), g(x)\\)가 \\(x=a\\)에서 연속일 때,\n" +
+          "다음 <보기> 중 \\(x=a\\)에서 **항상** 연속인 것들만 모아놓은 것은?\n\n" +
+          "<보기>\n" +
+          "1) \\(\\{g(x)\\}^2\\)\n" +
+          "2) \\(\\dfrac{1}{3}f(x) - 2g(x)\\)\n" +
+          "3) \\(\\dfrac{g(x)}{f(x)+g(x)}\\)\n",
+        choices: [
+          "①",
+          "①, ②",
+          "②, ③",
+          "①, ②, ③"
+        ],
+        correct: 1
+      },
+      // 문제 3
+      {
+        question:
+          "함수 \\(f(x)=2x, \\quad g(x)=x^2+2x-8\\).\n" +
+          "다음 \\( f(x)-g(x) = 2x - (x^2+2x-8) = -x^2+8\\)가 연속인 구간은?\n",
+        choices: [
+          "\\(( -\\infty, -4 )\\cup( -4, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 1
+      },
+      // 문제 4
+      {
+        question:
+          "동일한 \\(f, g\\)에 대하여 \\(f(x)g(x) = (2x)(x^2+2x-8)\\)가 연속인 구간은?\n",
+        choices: [
+          "\\(( -\\infty, -4 )\\cup( -4, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 1
+      },
+      // 문제 5
+      {
+        question:
+          "동일한 \\(f, g\\)에 대하여 \\(\\dfrac{g(x)}{f(x)} = \\dfrac{x^2+2x-8}{2x}\\)가 연속인 구간은?\n",
+        choices: [
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
+          "\\(( -\\infty, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 0
+      },
+      // 문제 6
+      {
+        question:
+          "동일한 \\(f, g\\)에 대하여 \\(\\dfrac{f(x)}{g(x)} = \\dfrac{2x}{x^2+2x-8}\\)가 연속인 구간은?\n" +
+          "(단, \\(x^2+2x-8=0\\)의 해는 \\(x=2\\) 또는 \\(x=-4\\).)",
+        choices: [
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 2
+      },
+      // 문제 7
+      {
+        question:
+          "함수 \\(f(x)=x^2+x-2,\\quad g(x)=2x-1\\)에 대하여\n" +
+          "\\(f(x)+g(x) = (x^2+x-2)+(2x-1)= x^2+3x-3\\)가 연속인 구간은?\n",
+        choices: [
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, \\tfrac{1}{2} )\\cup( \\tfrac{1}{2}, \\infty )\\)",
+          "\\(( -\\infty, -2 )\\cup( -2, 1 )\\cup( 1, \\infty )\\)"
+        ],
+        correct: 1
+      },
+      // 문제 8
+      {
+        question:
+          "동일한 \\(f(x)=x^2+x-2,\\quad g(x)=2x-1\\)에 대하여\n" +
+          "\\(f(x)g(x) = (x^2+x-2)(2x-1)\\)가 연속인 구간은?\n",
+        choices: [
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, \\tfrac{1}{2} )\\cup( \\tfrac{1}{2}, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 1
+      },
+      // 문제 9
+      {
+        question:
+          "동일한 \\(f, g\\)에 대하여\n" +
+          "\\(\\dfrac{f(x)}{g(x)} = \\dfrac{x^2+x-2}{2x-1}\\)가 연속인 구간은?\n" +
+          "(단, \\(2x-1=0\\)이면 \\(x=\\tfrac12\\).)",
+        choices: [
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, \\tfrac12 )\\cup( \\tfrac12, \\infty )\\)",
+          "\\(( -\\infty, -2 )\\cup( -2, 1 )\\cup( 1, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 1
+      },
+      // 문제 10
+      {
+        question:
+          "동일한 \\(f, g\\)에 대하여\n" +
+          "\\(\\dfrac{g(x)}{f(x)} = \\dfrac{2x-1}{x^2+x-2}\\)가 연속인 구간은?\n" +
+          "(단, \\(x^2+x-2=(x+2)(x-1)\\).)",
+        choices: [
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, \\tfrac12 )\\cup( \\tfrac12, \\infty )\\)",
+          "\\(( -\\infty, -2 )\\cup( -2, 1 )\\cup( 1, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 2
+      },
+      // 문제 11
+      {
+        question:
+          "함수 \\(f(x)=x^2-2x+1,\\quad g(x)=4x+3\\)에 대하여\n" +
+          "\\(f(x)-2g(x) = x^2-2x+1-2(4x+3)\\)가 연속인 구간은?\n",
+        choices: [
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 0
+      },
+      // 문제 12
+      {
+        question:
+          "동일한 \\(f, g\\)에 대하여\n" +
+          "\\(f(x)\\{g(x)\\}^2 = (x^2-2x+1)(4x+3)^2\\)가 연속인 구간은?\n",
+        choices: [
+          "\\(( -\\infty, \\infty )\\)",
+          "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
+          "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
+          "정의역이 없다"
+        ],
+        correct: 0
+      },
+      // 문제 15
+      {
+        question:
+          "다음 함수 \\(f(x)=\\dfrac{x^2}{|x|}\\)를 \\([-1,1]\\)에서 살펴볼 때, " +
+          "연속성을 올바르게 설명한 것은?",
+        choices: [
+          "\\([-1,1]\\) 전체에서 연속이다.",
+          "\\([-1,0)\\cup(0,1]\\)에서만 연속이며, \\(x=0\\)에서 정의되지 않는다.",
+          "\\([-1,0]\\cup[0,1]\\) 전체에서 모두 연속이다.",
+          "\\([-1,1]\\) 어디에서도 연속이 아니다."
+        ],
+        correct: 1
+      },
+      // 문제 16
+      {
+        question:
+          "함수 \\(f(x)=x|x|\\)를 \\([-1,1]\\)에서 살펴볼 때, " +
+          "연속성에 관한 설명으로 옳은 것은?",
+        choices: [
+          "\\([-1,0)\\cup(0,1]\\)에서만 연속이다.",
+          "\\([-1,1]\\) 전체에서 불연속이다.",
+          "\\([-1,1]\\) 전체에서 연속이다.",
+          "\\(x=0\\)에서만 불연속이다."
+        ],
+        correct: 2
+      },
+      // 문제 17
+      {
+        question:
+          "함수 \\(f(x)=|x|+|x-1|\\)를 \\([-1,1]\\)에서 살펴볼 때, " +
+          "연속성에 관한 설명으로 옳은 것은?",
+        choices: [
+          "\\([-1,1]\\) 전체에서 연속이다.",
+          "\\([-1,0)\\cup(0,1]\\)에서만 연속이다.",
+          "\\(x=0\\)과 \\(x=1\\)에서 불연속이다.",
+          "\\([-1,1]\\) 어디에서도 연속이 아니다."
+        ],
+        correct: 0
+      },
+      // 문제 18
+      {
+        question:
+          "함수 \\(f(x)=x-1\\)을 \\([0,1]\\)에서 살펴볼 때, " +
+          "최댓값과 최솟값은?",
+        choices: [
+          "최댓값 0, 최솟값 -1",
+          "최댓값 -1, 최솟값 0",
+          "최댓값 1, 최솟값 -1",
+          "최댓값 0, 최솟값 1"
+        ],
+        correct: 0
+      },
+      // 문제 19
+      {
+        question:
+          "함수 \\(f(x)=x+2\\)를 \\([-1,3]\\)에서 살펴볼 때, " +
+          "최댓값과 최솟값은?",
+        choices: [
+          "최댓값 5, 최솟값 1",
+          "최댓값 1, 최솟값 5",
+          "최댓값 4, 최솟값 -1",
+          "최댓값 -1, 최솟값 4"
+        ],
+        correct: 0
+      },
+      // 문제 20
+      {
+        question:
+          "함수 \\(f(x)=x^2+3\\)를 \\([1,3]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 4, 최댓값 9",
+          "최솟값 3, 최댓값 9",
+          "최솟값 4, 최댓값 12",
+          "최솟값 1, 최댓값 10"
+        ],
+        correct: 2
+      },
+      // 문제 21
+      {
+        question:
+          "함수 \\(f(x)=x^2+5\\)를 \\([-1,4]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 5, 최댓값 21",
+          "최솟값 6, 최댓값 21",
+          "최솟값 5, 최댓값 20",
+          "최솟값 6, 최댓값 20"
+        ],
+        correct: 0
+      },
+      // 문제 22
+      {
+        question:
+          "함수 \\(f(x)=-x^2+1\\)을 \\([-2,3]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 -8, 최댓값 1",
+          "최솟값 -3, 최댓값 1",
+          "최솟값 -4, 최댓값 2",
+          "최솟값 -9, 최댓값 1"
+        ],
+        correct: 0
+      },
+      // 문제 23
+      {
+        question:
+          "함수 \\(f(x)=x^2-4x\\)를 \\([0,3]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 -3, 최댓값 0",
+          "최솟값 -4, 최댓값 0",
+          "최솟값 -4, 최댓값 -3",
+          "최솟값 0, 최댓값 -4"
+        ],
+        correct: 1
+      },
+      // 문제 24
+      {
+        question:
+          "함수 \\(y=x^2-2x+3\\)를 \\([0,4]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 2, 최댓값 3",
+          "최솟값 2, 최댓값 11",
+          "최솟값 3, 최댓값 11",
+          "최솟값 0, 최댓값 4"
+        ],
+        correct: 1
+      },
+      // 문제 25
+      {
+        question:
+          "함수 \\(y=x^2-2x+4\\)를 \\([2,4]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 4, 최댓값 12",
+          "최솟값 0, 최댓값 4",
+          "최솟값 4, 최댓값 8",
+          "최솟값 8, 최댓값 12"
+        ],
+        correct: 0
+      },
+      // 문제 26
+      {
+        question:
+          "함수 \\(y=x^2-4x+5\\)를 \\([-1,3]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 1, 최댓값 10",
+          "-1, 10",
+          "-1, 2",
+          "1, 2"
+        ],
+        correct: 0
+      },
+      // 문제 27
+      {
+        question:
+          "함수 \\(f(x)=-x^2+4x-1\\)을 \\([-1,3]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 -6, 최댓값 3",
+          "최솟값 -6, 최댓값 4",
+          "최솟값 -1, 최댓값 4",
+          "최솟값 -1, 최댓값 3"
+        ],
+        correct: 0
+      },
+      // 문제 28
+      {
+        question:
+          "함수 \\(f(x)=-x^2+4x+2\\)를 \\([-1,3]\\)에서 살펴볼 때, " +
+          "최솟값과 최댓값은?",
+        choices: [
+          "최솟값 -3, 최댓값 5",
+          "최솟값 -3, 최댓값 6",
+          "최솟값 -8, 최댓값 6",
+          "최솟값 -1, 최댓값 5"
+        ],
+        correct: 1
+      },
+      // 문제 57
+      {
+        question:
+          "방정식 \\(x^3+3x-3=0\\)이 단 하나의 실근을 가질 때,\n" +
+          "그 실근이 존재하는 구간을 고르시오.\n\n" +
+          "<보기>\n" +
+          "1) \\((-1, -\\tfrac12)\\)\n" +
+          "2) \\((-\\tfrac12, 0)\\)\n" +
+          "3) \\((0, \\tfrac12)\\)\n" +
+          "4) \\((\\tfrac12, 1)\\)\n",
+        choices: [
+          "(1)",
+          "(2)",
+          "(3)",
+          "(4)"
+        ],
+        correct: 3
+      },
+      // 문제 58
+      {
+        question:
+          "방정식 \\(x^3+2x-10=0\\)이 단 하나의 실근을 가질 때,\n" +
+          "그 실근이 존재하는 구간은?\n\n" +
+          "<보기>\n" +
+          "1) \\((-2, -1)\\)\n" +
+          "2) \\((-1, 0)\\)\n" +
+          "3) \\((0, 1)\\)\n" +
+          "4) \\((1, 2)\\)\n",
+        choices: [
+          "(1)",
+          "(2)",
+          "(3)",
+          "(4)"
+        ],
+        correct: 3
+      },
+      // 문제 59
+      {
+        question:
+          "방정식 \\(x^3+x^2+x-2=0\\)이 단 하나의 실근을 가질 때,\n" +
+          "그 실근이 존재하는 구간은?\n\n" +
+          "<보기>\n" +
+          "1) \\((-1, 0)\\)\n" +
+          "2) \\((0, 1)\\)\n" +
+          "3) \\((1, 2)\\)\n" +
+          "4) \\((3, 4)\\)\n",
+        choices: [
+          "(1)",
+          "(2)",
+          "(3)",
+          "(4)"
+        ],
+        correct: 1
+      },
+      // 문제 60
+      {
+        question:
+          "방정식 \\(\\sqrt{x+1}-2x+3=0\\)이 단 하나의 실근을 가질 때,\n" +
+          "그 실근이 존재하는 구간은?\n\n" +
+          "<보기>\n" +
+          "1) \\((0,1)\\)\n" +
+          "2) \\((1,2)\\)\n" +
+          "3) \\((2,3)\\)\n" +
+          "4) \\((4,5)\\)\n",
+        choices: [
+          "(1)",
+          "(2)",
+          "(3)",
+          "(4)"
+        ],
+        correct: 2
+      },
+      // 문제 61
+      {
+        question:
+          "연속함수 \\(f(x)\\)에서\n" +
+          "\\(f(-2)=-1, \\; f(-1)=1, \\; f(0)=2, \\; f(1)=0, \\; f(2)=2, \\; f(3)=-4\\)\n" +
+          "\\([-2,3]\\)에서 방정식 \\(f(x)=0\\)의 실근은 몇 개?",
+        choices: [
+          "0개",
+          "1개",
+          "2개",
+          "3개 이상"
+        ],
+        correct: 3
+      },
+      // 문제 62
+      {
+        question:
+          "연속함수 \\(f(x)\\)에서\n" +
+          "\\(f(0)=-1, \\; f(1)=-3, \\; f(2)=5, \\; f(3)=-4, \\; f(4)=-2\\)\n" +
+          "\\([0,4]\\)에서 방정식 \\(f(x)-2x=0\\)의 실근은 몇 개?",
+        choices: [
+          "0개",
+          "1개",
+          "2개",
+          "3개 이상"
+        ],
+        correct: 2
+      },
+      // 문제 63
+      {
+        question:
+          "연속함수 \\(f(x)\\)에서\n" +
+          "\\(f(-1)=3, \\; f(0)=1, \\; f(1)=1, \\; f(2)=0\\)\n" +
+          "\\([-1,2]\\)에서 \\(f(x)-2x=0\\)의 실근은 몇 개?",
+        choices: [
+          "0개",
+          "1개",
+          "2개",
+          "3개 이상"
+        ],
+        correct: 1
+      },
+      // 문제 64
+      {
+        question:
+          "연속함수 \\(f(x)\\)에서\n" +
+          "\\(f(-1)=1, \\; f(0)=1, \\; f(1)=0, \\; f(2)=2\\)\n" +
+          "\\([0,2]\\)에서 방정식 \\(f(x-1)=f(x)\\)의 실근은 몇 개?",
+        choices: [
+          "0개",
+          "1개",
+          "2개",
+          "3개 이상"
+        ],
+        correct: 2
+      },
+      // 문제 65
+      {
+        question:
+          "실수 전체에서 연속인 \\(f(x)\\)에 대하여\n" +
+          "\\(f(-3)=-5, \\; f(-1)=2, \\; f(0)=5, \\; f(2)=-1, \\; f(4)=6\\)\n" +
+          "\\(\\lim_{x\\to -\\infty}f(x)=-\\infty, \\; \\lim_{x\\to \\infty}f(x)=\\infty\\)\n" +
+          "방정식 \\(f(x)=0\\)은 적어도 몇 개의 실근을 갖는가?",
+        choices: [
+          "1개",
+          "2개",
+          "3개",
+          "4개 이상"
+        ],
+        correct: 2
+      }
+      // 문제 66 (매개변수 a가 등장하는 문제는 중고등학생에게 다소 난이도가 높아 삭제함)
+    ];
 
-  // 문제 1
-  {
-    question: 
-      "두 함수 \\(f(x), g(x)\\)가 실수 전체에서 연속일 때,\n"+
-      "다음 <보기> 중 실수 전체에서 **항상** 연속인 것들만 모아놓은 것은?\n\n"+
-      "<보기>\n"+
-      "1) \\(f(x)+g(x)\\)\n"+
-      "2) \\(f(x)-g(x)\\)\n"+
-      "3) \\(f(x)g(x)\\)\n"+
-      "4) \\(\\dfrac{f(x)}{g(x)}\\)\n",
-    choices: [
-      "①, ②",
-      "①, ②, ③",
-      "①, ③",
-      "①, ②, ③, ④"
-    ],
-    correct: 1  // (B)
-  },
+    //-----------------------------------------------------
+    // 간단한 유틸: 배열 섞기
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+    //-----------------------------------------------------
 
-  // 문제 2
-  {
-    question: 
-      "두 함수 \\(f(x), g(x)\\)가 \\(x=a\\)에서 연속일 때,\n"+
-      "다음 <보기> 중 \\(x=a\\)에서 **항상** 연속인 것들만 모아놓은 것은?\n\n"+
-      "<보기>\n"+
-      "1) \\(\\{g(x)\\}^2\\)\n"+
-      "2) \\(\\dfrac{1}{3}f(x) - 2g(x)\\)\n"+
-      "3) \\(\\dfrac{g(x)}{f(x)+g(x)}\\)\n",
-    choices: [
-      "①",
-      "①, ②",
-      "②, ③",
-      "①, ②, ③"
-    ],
-    correct: 1  // (B)
-  },
+    let nameInput = "";
+    let difficulty = "";
+    let timePerQuestion = 0;
+    let scorePerQuestion = 0;
+    let infiniteTime = false; // 하 (시간제한 없음)
+    let lives = 3;
+    let score = 0;
+    let totalTime = 0; // 전체 게임 경과 시간(초)
+    let totalInterval = null; // 전체 시간 타이머
+    let questionTimer = null; // 문제별 시간 타이머
+    let energyBarWidth = 100; // 에너지바 너비(%)
+    let questionIndex = 0; // 현재 문제 index
+    let usedQuestions = []; // 출제할 문제 배열
+    let isGameOver = false;
+    let hasAnswered = false; // 현재 문제에 대해 답변이 이루어졌는지
+    let currentQuestion = null; // 현재 문제 객체
 
-  // 문제 3
-  {
-    question:
-      "함수 \\(f(x)=2x, \\quad g(x)=x^2 + 2x - 8\\).\n"+
-      "다음 \\( f(x)-g(x) = 2x - (x^2+2x-8) = -x^2 +8\\) 이 연속인 구간은?\n",
-    choices: [
-      "\\(( -\\infty, -4 )\\cup( -4, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 1
-  },
+    // 게임 시작
+    function startGame(diff) {
+      nameInput = document.getElementById('userName').value.trim();
+      if (!nameInput) {
+        alert("이름을 입력하세요.");
+        return;
+      }
+      difficulty = diff;
+      switch (difficulty) {
+        case "최상":
+          timePerQuestion = 20;
+          scorePerQuestion = 20;
+          break;
+        case "상":
+          timePerQuestion = 30;
+          scorePerQuestion = 15;
+          break;
+        case "중":
+          timePerQuestion = 40;
+          scorePerQuestion = 13;
+          break;
+        case "하":
+          infiniteTime = true;
+          timePerQuestion = 999999; // 사실상 제한 없음
+          scorePerQuestion = 10;
+          break;
+      }
 
-  // 문제 4
-  {
-    question:
-      "동일한 \\(f, g\\)에 대하여 \\(f(x)g(x) = (2x)(x^2+2x-8)\\) 이 연속인 구간은?\n",
-    choices: [
-      "\\(( -\\infty, -4 )\\cup( -4, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 1
-  },
+      // 전체 문제 배열 섞기
+      usedQuestions = [...allQuestions];
+      shuffleArray(usedQuestions);
 
-  // 문제 5
-  {
-    question:
-      "동일한 \\(f, g\\)에 대하여 \\(\\dfrac{g(x)}{f(x)} = \\dfrac{x^2+2x-8}{2x}\\) 이 연속인 구간은?\n",
-    choices: [
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
-      "\\(( -\\infty, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 0
-  },
+      // 화면 전환
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('quizArea').classList.remove('hidden');
 
-  // 문제 6
-  {
-    question:
-      "동일한 \\(f, g\\)에 대하여 \\(\\dfrac{f(x)}{g(x)} = \\dfrac{2x}{x^2+2x-8}\\) 이 연속인 구간은?\n"+
-      "(단, \\(x^2+2x-8=0\\)의 해는 \\(x=2\\) 또는 \\(x=-4\\).)",
-    choices: [
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 2
-  },
+      // 전체 경과 시간 타이머 시작
+      totalInterval = setInterval(() => {
+        totalTime++;
+        document.getElementById('totalTime').innerText = totalTime;
+      }, 1000);
 
-  // 문제 7
-  {
-    question:
-      "함수 \\(f(x)=x^2 + x - 2,\\ g(x)=2x-1\\) 에 대하여\n"+
-      "\\(f(x)+g(x) = (x^2+x-2) + (2x-1) = x^2+3x-3\\) 이 연속인 구간은?\n",
-    choices: [
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, \\tfrac{1}{2} )\\cup( \\tfrac{1}{2}, \\infty )\\)",
-      "\\(( -\\infty, -2 )\\cup( -2, 1 )\\cup( 1, \\infty )\\)"
-    ],
-    correct: 1
-  },
+      // 첫 문제 표시
+      showQuestion();
+    }
 
-  // 문제 8
-  {
-    question:
-      "동일한 \\(f(x)=x^2+x-2,\\ g(x)=2x-1\\) 에 대하여\n"+
-      "\\(f(x)g(x) = (x^2+x-2)(2x-1)\\) 이 연속인 구간은?\n",
-    choices: [
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, \\tfrac{1}{2} )\\cup( \\tfrac{1}{2}, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 1
-  },
+    // 문제 표시 – “다음문제” 버튼은 숨기고, 피드백 초기화
+    function showQuestion() {
+      if (isGameOver) return;
+      
+      // 문제를 모두 소진하면 무한 랜덤 출제
+      if (questionIndex >= usedQuestions.length) {
+        questionIndex = 0;
+        shuffleArray(usedQuestions);
+      }
+      hasAnswered = false;
+      document.getElementById('feedback').innerText = "";
+      document.getElementById('nextButton').classList.add('hidden');
 
-  // 문제 9
-  {
-    question:
-      "동일한 \\(f, g\\)에 대하여\n"+
-      "\\(\\dfrac{f(x)}{g(x)} = \\dfrac{x^2+x-2}{2x-1}\\) 이 연속인 구간은?\n"+
-      "(단, \\(2x-1=0\\)이면 \\(x=\\tfrac12\\).)",
-    choices: [
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, \\tfrac12 )\\cup( \\tfrac12, \\infty )\\)",
-      "\\(( -\\infty, -2 )\\cup( -2,1 )\\cup(1, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 1
-  },
+      currentQuestion = usedQuestions[questionIndex];
 
-  // 문제 10
-  {
-    question:
-      "동일한 \\(f, g\\)에 대하여\n"+
-      "\\(\\dfrac{g(x)}{f(x)} = \\dfrac{2x-1}{x^2+x-2}\\) 이 연속인 구간은?\n"+
-      "(단, \\(x^2 + x -2 = (x+2)(x-1)\\).)",
-    choices: [
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, \\tfrac12 )\\cup( \\tfrac12, \\infty )\\)",
-      "\\(( -\\infty, -2 )\\cup( -2,1 )\\cup(1, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 2
-  },
+      // 보기의 순서를 무작위로 섞음 (각 버튼은 원래의 보기 index를 인자로 넘김)
+      let indices = [0, 1, 2, 3];
+      shuffleArray(indices);
 
-  // 문제 11
-  {
-    question:
-      "함수 \\(f(x)=x^2 - 2x +1,\\ g(x)=4x+3\\) 에 대하여\n"+
-      "\\(f(x)-2g(x) = x^2-2x+1 - 2(4x+3)\\) 이 연속인 구간은?\n",
-    choices: [
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 0
-  },
+      let html = "<div class='question-container'>";
+      html += currentQuestion.question.replace(/\n/g, "<br>");
+      html += "<div class='choices-container'>";
+      for (let i = 0; i < indices.length; i++) {
+        const idx = indices[i];
+        html += "<div class='choice'><button onclick='checkAnswer(" + idx + ")'>" +
+          currentQuestion.choices[idx] + "</button></div>";
+      }
+      html += "</div></div>";
+      document.getElementById('questionDisplay').innerHTML = html;
+      MathJax.typeset();
 
-  // 문제 12
-  {
-    question:
-      "동일한 \\(f, g\\)에 대하여\n"+
-      "\\(f(x) \\{g(x)\\}^2 = (x^2 -2x +1)(4x+3)^2\\) 이 연속인 구간은?\n",
-    choices: [
-      "\\(( -\\infty, \\infty )\\)",
-      "\\(( -\\infty, 0 )\\cup( 0, \\infty )\\)",
-      "\\(( -\\infty, -4 )\\cup( -4, 2 )\\cup( 2, \\infty )\\)",
-      "정의역이 없다"
-    ],
-    correct: 0
-  },
-
-  // 문제 15
-  {
-    question:
-      "다음 함수 \\(f(x)=\\dfrac{x^2}{|x|}\\)를 \\([-1,1]\\)에서 살펴볼 때, 연속성을 올바르게 설명한 것은?",
-    choices: [
-      "\\([-1,1]\\) 전체에서 연속이다.",
-      "\\([-1,0)\\cup(0,1]\\)에서만 연속이고 \\(x=0\\)에서 정의되지 않는다.",
-      "\\([-1,0]\\cup[0,1]\\) 전체에서 모두 연속이다.",
-      "\\([-1,1]\\) 어디에서도 연속이 아니다."
-    ],
-    correct: 1
-  },
-
-  // 문제 16
-  {
-    question:
-      "함수 \\(f(x)= x|x|\\)을 \\([-1,1]\\)에서 살펴볼 때의 연속성 설명으로 옳은 것은?",
-    choices: [
-      "\\([-1,0)\\cup(0,1]\\)에서만 연속이다.",
-      "\\([-1,1]\\) 전체에서 불연속이다.",
-      "\\([-1,1]\\) 전체에서 연속이다.",
-      "\\(x=0\\)에서만 불연속이다."
-    ],
-    correct: 2
-  },
-
-  // 문제 17
-  {
-    question:
-      "함수 \\(f(x)= |x| + |x-1|\\)을 \\([-1,1]\\)에서 살펴볼 때의 연속성으로 옳은 것은?",
-    choices: [
-      "\\([-1,1]\\) 전체에서 연속이다.",
-      "\\([-1,0)\\cup(0,1]\\)에서만 연속이다.",
-      "\\(x=0\\)과 \\(x=1\\)에서 불연속이다.",
-      "\\([-1,1]\\) 어디에서도 연속이 아니다."
-    ],
-    correct: 0
-  },
-
-  // 문제 18
-  {
-    question:
-      "함수 \\(f(x)= x-1\\)을 \\([0,1]\\)에서 살펴볼 때, 최댓값과 최솟값은?",
-    choices: [
-      "최댓값 0, 최솟값 -1",
-      "최댓값 -1, 최솟값 0",
-      "최댓값 1, 최솟값 -1",
-      "최댓값 0, 최솟값 1"
-    ],
-    correct: 0
-  },
-
-  // 문제 19
-  {
-    question:
-      "함수 \\(f(x)= x+2\\)를 \\([-1,3]\\)에서 살펴볼 때, 최댓값과 최솟값은?",
-    choices: [
-      "최댓값 5, 최솟값 1",
-      "최댓값 1, 최솅값 5",
-      "최댓값 4, 최솟값 -1",
-      "최댓값 -1, 최솟값 4"
-    ],
-    correct: 0
-  },
-
-  // 문제 20
-  {
-    question:
-      "함수 \\(f(x)= x^2 +3\\)를 \\([1,3]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 4, 최댓값 9",
-      "최솟값 3, 최댓값 9",
-      "최솟값 4, 최댓값 12",
-      "최솟값 1, 최댓값 10"
-    ],
-    correct: 2
-  },
-
-  // 문제 21
-  {
-    question:
-      "함수 \\(f(x)= x^2 +5\\)를 \\([-1,4]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 5, 최댓값 21",
-      "최솟값 6, 최댓값 21",
-      "최솟값 5, 최댓값 20",
-      "최솟값 6, 최댓값 20"
-    ],
-    correct: 0
-  },
-
-  // 문제 22
-  {
-    question:
-      "함수 \\(f(x)= -x^2 +1\\)을 \\([-2,3]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 -8, 최댓값 1",
-      "최솟값 -3, 최댓값 1",
-      "최솟값 -4, 최댓값 2",
-      "최솟값 -9, 최댓값 1"
-    ],
-    correct: 0
-  },
-
-  // 문제 23
-  {
-    question:
-      "함수 \\(f(x)= x^2 -4x\\)를 \\([0,3]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 -3, 최댓값 0",
-      "최솟값 -4, 최댓값 0",
-      "최솟값 -4, 최댓값 -3",
-      "최솟값 0, 최댓값 -4"
-    ],
-    correct: 1
-  },
-
-  // 문제 24
-  {
-    question:
-      "함수 \\(y= x^2 -2x +3\\)를 \\([0,4]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 2, 최댓값 3",
-      "최솟값 2, 최댓값 11",
-      "최솟값 3, 최댓값 11",
-      "최솟값 0, 최댓값 4"
-    ],
-    correct: 1
-  },
-
-  // 문제 25
-  {
-    question:
-      "함수 \\(y= x^2 -2x +4\\)를 \\([2,4]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 4, 최댓값 12",
-      "최솟값 0, 최댓값 4",
-      "최솟값 4, 최댓값 8",
-      "최솟값 8, 최댓값 12"
-    ],
-    correct: 0
-  },
-
-  // 문제 26
-  {
-    question:
-      "함수 \\(y= x^2 -4x +5\\)를 \\([-1,3]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 1, 최댓값 10",
-      "-1, 10",
-      "-1, 2",
-      "1, 2"
-    ],
-    correct: 0
-  },
-
-  // 문제 27
-  {
-    question:
-      "함수 \\(f(x)= -x^2 +4x -1\\)을 \\([-1,3]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 -6, 최댓값 3",
-      "최솟값 -6, 최댓값 4",
-      "최솟값 -1, 최댓값 4",
-      "최솟값 -1, 최댓값 3"
-    ],
-    correct: 0
-  },
-
-  // 문제 28
-  {
-    question:
-      "함수 \\(f(x)= -x^2 +4x +2\\)를 \\([-1,3]\\)에서 살펴볼 때, 최솟값과 최댓값은?",
-    choices: [
-      "최솟값 -3, 최댓값 5",
-      "최솟값 -3, 최댓값 6",
-      "최솟값 -8, 최댓값 6",
-      "최솟값 -1, 최댓값 5"
-    ],
-    correct: 1
-  },
-
-  // 문제 57
-  {
-    question:
-      "방정식 \\(x^3 + 3x -3 =0\\)이 단 하나의 실근을 가질 때,\n"+
-      "그 실근이 존재하는 구간을 고르시오.\n\n"+
-      "<보기>\n"+
-      "1) \\((-1, -\\tfrac12)\\)\n"+
-      "2) \\((-\\tfrac12, 0)\\)\n"+
-      "3) \\((0, \\tfrac12)\\)\n"+
-      "4) \\((\\tfrac12, 1)\\)\n",
-    choices: [
-      "(1)",
-      "(2)",
-      "(3)",
-      "(4)"
-    ],
-    correct: 3
-  },
-
-  // 문제 58
-  {
-    question:
-      "방정식 \\(x^3 + 2x -10 =0\\)이 단 하나의 실근을 가질 때,\n"+
-      "그 실근이 존재하는 구간은?\n\n"+
-      "<보기>\n"+
-      "1) \\((-2, -1)\\)\n"+
-      "2) \\((-1, 0)\\)\n"+
-      "3) \\((0, 1)\\)\n"+
-      "4) \\((1, 2)\\)\n",
-    choices: [
-      "(1)",
-      "(2)",
-      "(3)",
-      "(4)"
-    ],
-    correct: 3
-  },
-
-  // 문제 59
-  {
-    question:
-      "방정식 \\(x^3 + x^2 + x -2 =0\\)이 단 하나의 실근을 가질 때,\n"+
-      "그 실근이 존재하는 구간은?\n\n"+
-      "<보기>\n"+
-      "1) \\((-1, 0)\\)\n"+
-      "2) \\((0, 1)\\)\n"+
-      "3) \\((1, 2)\\)\n"+
-      "4) \\((3, 4)\\)\n",
-    choices: [
-      "(1)",
-      "(2)",
-      "(3)",
-      "(4)"
-    ],
-    correct: 1
-  },
-
-  // 문제 60
-  {
-    question:
-      "방정식 \\(\\sqrt{x+1} -2x +3=0\\)이 단 하나의 실근을 가질 때,\n"+
-      "그 실근이 존재하는 구간은?\n\n"+
-      "<보기>\n"+
-      "1) \\((0,1)\\)\n"+
-      "2) \\((1,2)\\)\n"+
-      "3) \\((2,3)\\)\n"+
-      "4) \\((4,5)\\)\n",
-    choices: [
-      "(1)",
-      "(2)",
-      "(3)",
-      "(4)"
-    ],
-    correct: 2
-  },
-
-  // 문제 61
-  {
-    question:
-      "연속함수 \\(f(x)\\)에서\n"+
-      "\\(f(-2)=-1, f(-1)=1, f(0)=2, f(1)=0, f(2)=2, f(3)=-4\\)\n"+
-      "\\([-2,3]\\)에서 방정식 \\(f(x)=0\\)의 실근은 몇 개?\n",
-    choices: [
-      "0개",
-      "1개",
-      "2개",
-      "3개 이상"
-    ],
-    correct: 3
-  },
-
-  // 문제 62
-  {
-    question:
-      "연속함수 \\(f(x)\\)에서\n"+
-      "\\(f(0)=-1, f(1)=-3, f(2)=5, f(3)=-4, f(4)=-2\\)\n"+
-      "\\([0,4]\\)에서 방정식 \\(f(x)-2x=0\\)의 실근은 몇 개?\n",
-    choices: [
-      "0개",
-      "1개",
-      "2개",
-      "3개 이상"
-    ],
-    correct: 2
-  },
-
-  // 문제 63
-  {
-    question:
-      "연속함수 \\(f(x)\\)에서\n"+
-      "\\(f(-1)=3, f(0)=1, f(1)=1, f(2)=0\\)\n"+
-      "\\([-1,2]\\)에서 \\(f(x)-2x=0\\)의 실근은 몇 개?\n",
-    choices: [
-      "0개",
-      "1개",
-      "2개",
-      "3개 이상"
-    ],
-    correct: 1
-  },
-
-  // 문제 64
-  {
-    question:
-      "연속함수 \\(f(x)\\)에서\n"+
-      "\\(f(-1)=1, f(0)=1, f(1)=0, f(2)=2\\)\n"+
-      "\\([0,2]\\)에서 방정식 \\(f(x-1)=f(x)\\)의 실근은 몇 개?\n",
-    choices: [
-      "0개",
-      "1개",
-      "2개",
-      "3개 이상"
-    ],
-    correct: 2
-  },
-
-  // 문제 65
-  {
-    question:
-      "실수 전체에서 연속인 \\(f(x)\\)에 대하여\n"+
-      "\\(f(-3)=-5, f(-1)=2, f(0)=5, f(2)=-1, f(4)=6\\)\n"+
-      "\\(\\lim_{x\\to -\\infty} f(x)=-\\infty,\\ \\lim_{x\\to \\infty} f(x)=\\infty\\)\n"+
-      "방정식 \\(f(x)=0\\)은 적어도 몇 개의 실근을 갖는가?\n",
-    choices: [
-      "1개",
-      "2개",
-      "3개",
-      "4개 이상"
-    ],
-    correct: 2
-  },
-
-  // 문제 66
-  {
-    question:
-      "실수 전체에서 연속인 함수 \\(f(x)\\)가\n"+
-      "\\(f(-1)=a+1, f(2)=a-3\\)를 만족시킨다.\n"+
-      "방정식 \\(f(x)-x^2=0\\)이 중근 없이 오직 하나의 실근을 갖고,\n"+
-      "그 해가 \\((-1,2)\\) 안에 존재하도록 하는 \\(a\\)의 범위는?\n",
-    choices: [
-      "\\(a < 0\\)",
-      "\\(0 < a < 7\\)",
-      "\\(a > 7\\)",
-      "그런 \\(a\\)는 존재하지 않는다."
-    ],
-    correct: 1
-  }
-
-]; // end allQuestions
-
-
-//-----------------------------------------------------
-// 간단한 유틸 함수: 배열 섞기
-function shuffleArray(arr) {
-  for(let i=arr.length-1; i>0; i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-}
-
-//-----------------------------------------------------
-
-let nameInput = "";
-let difficulty = "";
-let timePerQuestion = 0;
-let scorePerQuestion = 0;
-let infiniteTime = false; // 하(시간제한없음)
-let lives = 3;
-let score = 0;
-let totalTime = 0; // 전체 게임 경과시간(초)
-let totalInterval = null; // 전체 시간 타이머
-let questionTimer = null; // 문제별 시간 타이머
-let energyBarWidth = 100; // energyBar 퍼센트
-let questionIndex = 0; // 현재 문제 index
-let usedQuestions = []; // 처음엔 allQuestions 전체를 섞어 출제
-let isGameOver = false;
-
-// 게임 시작
-function startGame(diff) {
-  nameInput = document.getElementById('userName').value.trim();
-  if(!nameInput) {
-    alert("이름을 입력하세요.");
-    return;
-  }
-  difficulty = diff;
-  switch(difficulty) {
-    case "최상":
-      timePerQuestion = 20;
-      scorePerQuestion = 20;
-      break;
-    case "상":
-      timePerQuestion = 30;
-      scorePerQuestion = 15;
-      break;
-    case "중":
-      timePerQuestion = 40;
-      scorePerQuestion = 13;
-      break;
-    case "하":
-      infiniteTime = true;
-      timePerQuestion = 999999; // 사실상 제한 없이
-      scorePerQuestion = 10;
-      break;
-  }
-
-  // 전체 질문 섞어 준비
-  usedQuestions = [...allQuestions];
-  shuffleArray(usedQuestions);
-
-  // 화면 전환
-  document.getElementById('startScreen').classList.add('hidden');
-  document.getElementById('quizArea').classList.remove('hidden');
-
-  // 전체 시간 타이머 시작
-  totalInterval = setInterval(()=>{
-    totalTime++;
-    document.getElementById('totalTime').innerText = totalTime;
-  },1000);
-
-  // 첫 문제 표시
-  showQuestion();
-}
-
-// 문제 표시
-function showQuestion() {
-  if(isGameOver) return;
-
-  // 문제를 꺼내되, 모든 문제를 소진하면 “무한 랜덤”으로 전환
-  if(questionIndex >= usedQuestions.length) {
-    // 끝없이 랜덤으로 출제
-    questionIndex = 0;
-    shuffleArray(usedQuestions);
-  }
-
-  const currentQ = usedQuestions[questionIndex];
-  // 보기 섞기
-  let choiceIndices = [0,1,2,3];
-  shuffleArray(choiceIndices);
-
-  // 문제 HTML 구성
-  let html = "<div class='question-container'>"+
-             "<div>"+ currentQ.question.replace(/\n/g,"<br>") +"</div>";
-
-  html += "<div class='choices-container'>";
-  for(let i=0; i<4; i++){
-    const cindex = choiceIndices[i];
-    html += "<div class='choice'><button onclick='checkAnswer("+cindex+")'>"
-         + currentQ.choices[cindex] + "</button></div>";
-  }
-  html += "</div></div>";
-
-  document.getElementById('questionDisplay').innerHTML = html;
-
-  // MathJax 렌더링
-  MathJax.typeset();
-
-  // 문제별 타이머/에너지바 초기화
-  clearInterval(questionTimer);
-  energyBarWidth = 100;
-  updateEnergyBar();
-
-  if(!infiniteTime){
-    let remain = timePerQuestion;
-    questionTimer = setInterval(()=>{
-      remain--;
-      // 에너지바 갱신
-      energyBarWidth = (remain/timePerQuestion)*100;
+      // 에너지바 초기화
+      clearInterval(questionTimer);
+      energyBarWidth = 100;
       updateEnergyBar();
-      if(remain <= 0) {
-        // 시간 소진 -> 기회 1 감소 & 다음 문제
-        clearInterval(questionTimer);
+
+      // 타이머 시작 (무제한이 아니면)
+      if (!infiniteTime) {
+        let remain = timePerQuestion;
+        questionTimer = setInterval(() => {
+          remain--;
+          energyBarWidth = (remain / timePerQuestion) * 100;
+          updateEnergyBar();
+          if (remain <= 0) {
+            clearInterval(questionTimer);
+            if (!hasAnswered) {
+              hasAnswered = true;
+              lives--;
+              updateLives();
+              // 시간 초과 시 정답 표시
+              document.getElementById('feedback').innerText =
+                "시간 초과! 정답은: " + currentQuestion.choices[currentQuestion.correct];
+              // 답안 버튼 비활성화
+              disableAnswerButtons();
+              if (lives <= 0) {
+                gameOver();
+                return;
+              }
+              document.getElementById('nextButton').classList.remove('hidden');
+            }
+          }
+        }, 1000);
+      } else {
+        energyBarWidth = 100;
+        updateEnergyBar();
+      }
+    }
+
+    // 사용자가 답안을 선택했을 때
+    function checkAnswer(chosenIdx) {
+      if (hasAnswered || isGameOver) return;
+      hasAnswered = true;
+      clearInterval(questionTimer);
+
+      // 답안 버튼 비활성화
+      disableAnswerButtons();
+
+      if (chosenIdx === currentQuestion.correct) {
+        score += scorePerQuestion;
+        document.getElementById('score').innerText = score;
+        document.getElementById('feedback').innerText = "정답입니다!";
+      } else {
+        document.getElementById('feedback').innerText =
+          "틀렸습니다! 정답은: " + currentQuestion.choices[currentQuestion.correct];
         lives--;
         updateLives();
-        if(lives<=0) {
+        if (lives <= 0) {
           gameOver();
           return;
         }
-        questionIndex++;
-        showQuestion();
       }
-    },1000);
-  } else {
-    // 하(무제한)인 경우 에너지바를 가득 채운 채 유지
-    energyBarWidth = 100;
-    updateEnergyBar();
-  }
-}
-
-// 보기 클릭 시 정답 체크
-function checkAnswer(chosenIndex){
-  if(isGameOver) return;
-
-  clearInterval(questionTimer);
-
-  const currentQ = usedQuestions[questionIndex];
-  // 정답 찾아야 함
-  // shuffle 해놓았으므로, 다시 한번 choices를 비교해야 한다.
-  // 하지만 우리는 choiceIndices를 어딘가 저장해야 비교 가능.
-  // 좀 더 간단히: in showQuestion, we stored the random arrangement in "choiceIndices".
-  // We'll store them globally so we can compare. 
-  // Or we can do a simpler approach: we can store the correct index in a global.
-  // We'll do the simpler approach: store the 'mappedCorrectIndex' in a global.
-
-  // better approach: we do the matching approach:
-  // because in showQuestion, we have "choiceIndices" => the correct choice is "currentQ.correct"
-  // So if "choiceIndices[i] == currentQ.correct", that i is the correct button in the new arrangement.
-  let correctButtonIndex = -1;
-  for(let i=0;i<4;i++){
-    if(choiceIndices[i]===currentQ.correct) {
-      correctButtonIndex = i;
-      break;
+      // 다음 문제 버튼 활성화
+      document.getElementById('nextButton').classList.remove('hidden');
     }
-  }
 
-  // chosenIndex vs correctButtonIndex
-  if(chosenIndex===correctButtonIndex) {
-    // 정답
-    score += scorePerQuestion;
-    document.getElementById('score').innerText = score;
-  } else {
-    // 틀림 -> 정답 표시
-    alert("틀렸습니다! 정답은: "+ currentQ.choices[choiceIndices[correctButtonIndex]]);
-    lives--;
-    updateLives();
-    if(lives<=0) {
-      gameOver();
-      return;
+    // 답안 버튼들을 모두 비활성화
+    function disableAnswerButtons() {
+      const buttons = document.querySelectorAll('.choice button');
+      buttons.forEach(btn => btn.disabled = true);
     }
-  }
 
-  // 다음 문제
-  questionIndex++;
-  showQuestion();
-}
+    function updateEnergyBar() {
+      document.getElementById('energyBar').style.width = energyBarWidth + "%";
+    }
 
-// 전역 변수로 choiceIndices 보관
-let choiceIndices = [0,1,2,3]; 
-function updateEnergyBar(){
-  document.getElementById('energyBar').style.width = energyBarWidth+"%";
-}
-function updateLives(){
-  document.getElementById('lives').innerText = lives;
-}
+    function updateLives() {
+      document.getElementById('lives').innerText = lives;
+    }
 
-// 게임 종료
-function gameOver(){
-  isGameOver = true;
-  clearInterval(totalInterval);
-  clearInterval(questionTimer);
+    // 다음 문제로 넘어감
+    function nextQuestion() {
+      questionIndex++;
+      showQuestion();
+    }
 
-  // 화면 전환
-  document.getElementById('quizArea').classList.add('hidden');
-  document.getElementById('finalArea').classList.remove('hidden');
-  document.getElementById('finalScore').innerText = score;
-}
+    // 게임 종료
+    function gameOver() {
+      isGameOver = true;
+      clearInterval(totalInterval);
+      clearInterval(questionTimer);
+      document.getElementById('quizArea').classList.add('hidden');
+      document.getElementById('finalArea').classList.remove('hidden');
+      document.getElementById('finalScore').innerText = score;
+    }
 
-// 점수 전송
-function sendScore(){
-  saveData("연속함수의성질", nameInput, score, totalTime);
-}
+    // 점수 전송
+    async function sendScore() {
+      saveData("연속함수의성질", nameInput, score, totalTime);
+    }
 
-// 문제에서 주신 코드
-async function saveData(game, name, score, elapsedTime) {
-    const FUNCTION_URL = "https://us-central1-record-f420d.cloudfunctions.net/report";
-
-    const requestData = {
+    // 문제에서 주신 점수 전송 코드
+    async function saveData(game, name, score, elapsedTime) {
+      const FUNCTION_URL = "https://us-central1-record-f420d.cloudfunctions.net/report";
+      const requestData = {
         game,
         name,
         score: parseInt(score, 10),
         elapsedTime: parseInt(elapsedTime, 10)
-    };
+      };
 
-    try {
+      try {
         const response = await fetch(FUNCTION_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
         });
-
         const responseData = await response.json();
-
         if (response.ok) {
-            document.getElementById('response').innerText = 
-                "성공: " + JSON.stringify(responseData, null, 2);
+          document.getElementById('response').innerText =
+            "성공: " + JSON.stringify(responseData, null, 2);
         } else {
-            document.getElementById('response').innerText = 
-                "오류: " + JSON.stringify(responseData, null, 2);
+          document.getElementById('response').innerText =
+            "오류: " + JSON.stringify(responseData, null, 2);
         }
-    } catch (error) {
+      } catch (error) {
         console.error('요청 실패:', error);
-        document.getElementById('response').innerText = 
-            "네트워크 오류: " + error.message;
+        document.getElementById('response').innerText =
+          "네트워크 오류: " + error.message;
+      }
     }
-}
-
-</script>
+  </script>
 </body>
 </html>
